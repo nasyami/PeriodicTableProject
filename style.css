@@ -1,0 +1,104 @@
+body {
+    margin: 0;
+    background-color: #000;
+    font-family: Helvetica, sans-serif;
+    overflow: hidden;
+}
+
+/* --- LOGIN SCREEN --- */
+#login-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: white;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-box {
+    text-align: center;
+    padding: 50px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    background: white;
+}
+.g-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #3c4043;
+    margin: 20px auto;
+}
+.g-btn:hover { background-color: #f7fafe; border-color: #d2e3fc; }
+.g-btn img { width: 18px; margin-right: 10px; }
+
+/* --- 3D ELEMENT (THE CARD) --- */
+.element {
+    width: 120px;
+    height: 160px;
+    box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
+    border: 1px solid rgba(127,255,255,0.25);
+    text-align: center;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 5px;
+    box-sizing: border-box;
+    transition: background-color 0.5s;
+}
+
+.element:hover {
+    box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
+    border: 1px solid rgba(127,255,255,0.75);
+    z-index: 100; /* Bring to front on hover */
+}
+
+.element img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%; /* Circular photo */
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+.element .name {
+    font-size: 12px;
+    font-weight: bold;
+    color: rgba(255,255,255,1);
+    text-shadow: 0 0 10px rgba(0,255,255,0.95);
+    margin-bottom: 5px;
+}
+
+.element .details {
+    font-size: 10px;
+    color: rgba(127,255,255,0.75);
+}
+
+/* --- MENU --- */
+#menu {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    z-index: 100;
+}
+button {
+    color: rgba(127,255,255,0.75);
+    background: transparent;
+    outline: 1px solid rgba(127,255,255,0.75);
+    border: 0px;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+button:hover { background-color: rgba(0,255,255,0.5); }
+button:active { color: #000000; background-color: rgba(0,255,255,0.75); }
