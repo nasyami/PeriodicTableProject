@@ -12,6 +12,7 @@ const objects = [];
 const targets = { table: [], sphere: [], helix: [], grid: [], tetrahedron: [] };
 let tokenClient;
 
+// --- 1. GOOGLE AUTH & INIT ---
 function initApp() {
     if (!window.google) {
         setTimeout(initApp, 100);
@@ -45,20 +46,21 @@ async function fetchData(token) {
     animate();
 }
 
+// --- 2. 3D SCENE SETUP ---
 function init3D(data) {
     camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.z = 3000;
 
     scene = new THREE.Scene();
 
-    // 1. Create all CSS3DObjects
+    // Create CSS3D Objects (The Cards)
     for (let i = 0; i < data.length; i++) {
         const el = document.createElement('div');
         el.className = 'element';
         el.style.backgroundColor = 'rgba(0,127,127,' + (Math.random() * 0.5 + 0.25) + ')';
 
         const img = document.createElement('img');
-        img.src = data[i][1]; 
+        img.src = data[i][1];
         el.appendChild(img);
 
         const name = document.createElement('div');
@@ -79,16 +81,15 @@ function init3D(data) {
         objects.push(obj);
     }
 
-    // 2. Define TABLE targets
+    // --- TARGETS: TABLE ---
     for (let i = 0; i < objects.length; i++) {
         const t = new THREE.Object3D();
-        // Simple grid layout for table view
         t.position.x = (i % 20) * 140 - 1330;
         t.position.y = -(Math.floor(i / 20)) * 180 + 990;
         targets.table.push(t);
     }
 
-    // 3. Define SPHERE targets
+    // --- TARGETS: SPHERE ---
     const vector = new THREE.Vector3();
     for (let i = 0; i < objects.length; i++) {
         const obj = new THREE.Object3D();
@@ -100,7 +101,7 @@ function init3D(data) {
         targets.sphere.push(obj);
     }
 
-    // 4. Define HELIX targets
+    // --- TARGETS: HELIX ---
     for (let i = 0; i < objects.length; i++) {
         const obj = new THREE.Object3D();
         const theta = i * 0.175 + Math.PI;
@@ -113,7 +114,7 @@ function init3D(data) {
         targets.helix.push(obj);
     }
 
-    // 5. Define GRID targets
+    // --- TARGETS: GRID ---
     for (let i = 0; i < objects.length; i++) {
         const obj = new THREE.Object3D();
         obj.position.x = (i % 5) * 400 - 800;
@@ -122,54 +123,66 @@ function init3D(data) {
         targets.grid.push(obj);
     }
 
-    // 6. Define TETRAHEDRON targets (FIXED)
+    // --- TARGETS: TETRAHEDRON (FIXED PYRAMID) ---
     let index = 0;
-    let layer = 0;
-    // Build a pyramid shape
-    while (index < objects.length) {
-        for (let row = 0; row <= layer && index < objects.length; row++) {
-            for (let col = 0; col <= layer - row && index < objects.length; col++) {
+    // Loop through layers (1 to 8)
+    for (let i = 1; i <= 8; i++) {
+        // Loop through rows in this layer
+        for (let j = 0; j < i; j++) {
+            // Loop through items in this row
+            for (let k = 0; k <= j; k++) {
+                if (index >= objects.length) break;
+
                 const obj = new THREE.Object3D();
                 
-                // Position logic for pyramid layers
-                obj.position.x = (col - (layer - row) / 2) * 160;
-                obj.position.z = (row - layer / 2) * 160;
-                obj.position.y = layer * 140 - 400; // Stack upwards
-                
-                // IMPORTANT: Make elements face center/outwards so it looks 3D
+                // Centering Logic
+                const spacing = 160;
+                // x: Center the row
+                obj.position.x = (k - j * 0.5) * spacing;
+                // z: Center the layer depth
+                obj.position.z = (j - (i - 1) * 0.5) * spacing;
+                // y: Stack from top down
+                obj.position.y = -(i * 140) + 800;
+
+                // Make them look slightly outward for 3D effect
                 vector.copy(obj.position).multiplyScalar(2);
                 obj.lookAt(vector);
-                
+
                 targets.tetrahedron.push(obj);
                 index++;
             }
         }
-        layer++;
     }
 
-    // Renderer & Controls
+    // --- RENDERER ---
     renderer = new CSS3DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById('container').appendChild(renderer.domElement);
 
+    // --- CONTROLS ---
     controls = new TrackballControls(camera, renderer.domElement);
     controls.minDistance = 500;
     controls.maxDistance = 6000;
     controls.addEventListener('change', render);
 
-    // Button Listeners
-    document.getElementById('table').onclick = () => transform(targets.table, 2000);
-    document.getElementById('sphere').onclick = () => transform(targets.sphere, 2000);
-    document.getElementById('helix').onclick = () => transform(targets.helix, 2000);
-    document.getElementById('grid').onclick = () => transform(targets.grid, 2000);
-    document.getElementById('tetrahedron').onclick = () => transform(targets.tetrahedron, 2000);
+    // --- BUTTONS ---
+    const buttonTable = document.getElementById('table');
+    const buttonSphere = document.getElementById('sphere');
+    const buttonHelix = document.getElementById('helix');
+    const buttonGrid = document.getElementById('grid');
+    const buttonTetra = document.getElementById('tetrahedron');
 
-    // Initial transform
+    buttonTable.addEventListener('click', () => transform(targets.table, 2000));
+    buttonSphere.addEventListener('click', () => transform(targets.sphere, 2000));
+    buttonHelix.addEventListener('click', () => transform(targets.helix, 2000));
+    buttonGrid.addEventListener('click', () => transform(targets.grid, 2000));
+    buttonTetra.addEventListener('click', () => transform(targets.tetrahedron, 2000));
+
     transform(targets.table, 2000);
     window.addEventListener('resize', onResize);
 }
 
-// FIXED TRANSFORM FUNCTION (Includes Rotation)
+// --- 3. ANIMATION & TRANSFORM ---
 function transform(targetsArr, duration) {
     TWEEN.removeAll();
 
@@ -177,13 +190,13 @@ function transform(targetsArr, duration) {
         const object = objects[i];
         const target = targetsArr[i];
 
-        // Position Tween
+        // Animate Position
         new TWEEN.Tween(object.position)
             .to({ x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration)
             .easing(TWEEN.Easing.Exponential.InOut)
             .start();
 
-        // Rotation Tween (Fixes the visual bug)
+        // Animate Rotation (CRITICAL FIX)
         new TWEEN.Tween(object.rotation)
             .to({ x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration)
             .easing(TWEEN.Easing.Exponential.InOut)

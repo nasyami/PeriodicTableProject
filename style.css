@@ -13,7 +13,7 @@ body {
     box-shadow: 0 0 12px rgba(0,255,255,0.5);
     text-align: center;
     padding: 10px;
-    box-sizing: border-box; /* Helps with padding calculation */
+    box-sizing: border-box;
 }
 
 .element:hover {
