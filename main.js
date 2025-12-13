@@ -98,7 +98,7 @@ function init3D(data) {
         objects.push(obj);
     }
 
-    // --- TARGETS: TABLE ---
+    // --- TABLE ---
     for (let i = 0; i < objects.length; i++) {
         const t = new THREE.Object3D();
         t.position.x = (i % 20) * 140 - 1330;
@@ -106,7 +106,7 @@ function init3D(data) {
         targets.table.push(t);
     }
 
-    // --- TARGETS: SPHERE ---
+    // --- SPHERE ---
     const vector = new THREE.Vector3();
     for (let i = 0; i < objects.length; i++) {
         const obj = new THREE.Object3D();
@@ -118,7 +118,7 @@ function init3D(data) {
         targets.sphere.push(obj);
     }
 
-    // --- TARGETS: HELIX (DOUBLE HELIX REQUIREMENT) ---
+    // --- HELIX  ---
     // Source 23: "For the Helix, it should be a double Helix"
     for (let i = 0; i < objects.length; i++) {
         const obj = new THREE.Object3D();
@@ -139,8 +139,7 @@ function init3D(data) {
         targets.helix.push(obj);
     }
 
-    // --- TARGETS: GRID (5x4x10 REQUIREMENT) ---
-    // Source 24: "Grid should be 5x4x10"
+    // GRID  ---
     for (let i = 0; i < objects.length; i++) {
         const obj = new THREE.Object3D();
         obj.position.x = (i % 5) * 400 - 800;              // 5 columns
