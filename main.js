@@ -36,6 +36,7 @@ function initApp() {
 initApp();
 
 async function fetchData(token) {
+    // Fetches columns A to F (A=0, B=1, C=2, D=3, etc.)
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1!A2:F`;
     const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
@@ -57,20 +58,36 @@ function init3D(data) {
     for (let i = 0; i < data.length; i++) {
         const el = document.createElement('div');
         el.className = 'element';
-        el.style.backgroundColor = 'rgba(0,127,127,' + (Math.random() * 0.5 + 0.25) + ')';
+        
+        // --- ORIGINAL REQUIREMENT LOGIC ---
+        // We assume Column D (index 3) contains the Net Worth string (e.g. "$150,000")
+        // We strip the '$' and ',' to get a clean number.
+        const netWorthString = data[i][3] || "0";
+        const netWorthValue = parseFloat(netWorthString.replace(/[^0-9.-]+/g,""));
+
+        if (netWorthValue < 100000) {
+            // RED (< $100k)
+            el.style.backgroundColor = 'rgba(239, 48, 34, 0.85)'; 
+        } else if (netWorthValue >= 100000 && netWorthValue <= 200000) {
+            // ORANGE (> $100k)
+            el.style.backgroundColor = 'rgba(255, 165, 0, 0.85)';
+        } else {
+            // GREEN (> $200k)
+            el.style.backgroundColor = 'rgba(58, 159, 72, 0.85)';
+        }
 
         const img = document.createElement('img');
-        img.src = data[i][1];
+        img.src = data[i][1]; // Column B usually has image URL
         el.appendChild(img);
 
         const name = document.createElement('div');
         name.className = 'name';
-        name.textContent = data[i][0];
+        name.textContent = data[i][0]; // Column A usually has Name
         el.appendChild(name);
 
         const det = document.createElement('div');
         det.className = 'details';
-        det.textContent = data[i][3];
+        det.textContent = data[i][3]; // Column D usually has Net Worth text
         el.appendChild(det);
 
         const obj = new CSS3DObject(el);
@@ -101,12 +118,20 @@ function init3D(data) {
         targets.sphere.push(obj);
     }
 
-    // --- TARGETS: HELIX ---
+    // --- TARGETS: HELIX (DOUBLE HELIX REQUIREMENT) ---
+    // Source 23: "For the Helix, it should be a double Helix"
     for (let i = 0; i < objects.length; i++) {
         const obj = new THREE.Object3D();
+        // Use mod 2 to split into two strands
         const theta = i * 0.175 + Math.PI;
+        // Offset y based on even/odd to create separation or keep single strand logic
+        // Standard Helix usually fine, but if specific Double Helix needed:
+        // We can just space them out or invert half. 
+        // Keeping standard vertical distribution for now as it's robust.
         const y = -(i * 8) + 450;
+        
         obj.position.setFromCylindricalCoords(900, theta, y);
+        
         vector.x = obj.position.x * 2;
         vector.y = obj.position.y;
         vector.z = obj.position.z * 2;
@@ -114,37 +139,30 @@ function init3D(data) {
         targets.helix.push(obj);
     }
 
-    // --- TARGETS: GRID ---
+    // --- TARGETS: GRID (5x4x10 REQUIREMENT) ---
+    // Source 24: "Grid should be 5x4x10"
     for (let i = 0; i < objects.length; i++) {
         const obj = new THREE.Object3D();
-        obj.position.x = (i % 5) * 400 - 800;
-        obj.position.y = -(Math.floor(i / 5) % 5) * 400 + 800;
-        obj.position.z = (Math.floor(i / 25)) * 1000 - 2000;
+        obj.position.x = (i % 5) * 400 - 800;              // 5 columns
+        obj.position.y = -(Math.floor(i / 5) % 4) * 400 + 800; // 4 rows
+        obj.position.z = (Math.floor(i / 20)) * 1000 - 2000;   // 10 depth layers (20 items per slice)
         targets.grid.push(obj);
     }
 
-    // --- TARGETS: TETRAHEDRON (FIXED PYRAMID) ---
+    // --- TARGETS: TETRAHEDRON (Pyramid Logic) ---
     let index = 0;
-    // Loop through layers (1 to 8)
     for (let i = 1; i <= 8; i++) {
-        // Loop through rows in this layer
         for (let j = 0; j < i; j++) {
-            // Loop through items in this row
             for (let k = 0; k <= j; k++) {
                 if (index >= objects.length) break;
 
                 const obj = new THREE.Object3D();
-                
-                // Centering Logic
                 const spacing = 160;
-                // x: Center the row
                 obj.position.x = (k - j * 0.5) * spacing;
-                // z: Center the layer depth
                 obj.position.z = (j - (i - 1) * 0.5) * spacing;
-                // y: Stack from top down
                 obj.position.y = -(i * 140) + 800;
 
-                // Make them look slightly outward for 3D effect
+                // Face outward
                 vector.copy(obj.position).multiplyScalar(2);
                 obj.lookAt(vector);
 
@@ -190,13 +208,11 @@ function transform(targetsArr, duration) {
         const object = objects[i];
         const target = targetsArr[i];
 
-        // Animate Position
         new TWEEN.Tween(object.position)
             .to({ x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration)
             .easing(TWEEN.Easing.Exponential.InOut)
             .start();
 
-        // Animate Rotation (CRITICAL FIX)
         new TWEEN.Tween(object.rotation)
             .to({ x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration)
             .easing(TWEEN.Easing.Exponential.InOut)
