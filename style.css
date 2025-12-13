@@ -5,7 +5,6 @@ body {
     overflow: hidden;
 }
 
-/* --- LOGIN SCREEN --- */
 #login-overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -15,6 +14,7 @@ body {
     justify-content: center;
     align-items: center;
 }
+
 .login-box {
     text-align: center;
     padding: 50px;
@@ -22,6 +22,7 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     background: white;
 }
+
 .g-btn {
     display: flex;
     align-items: center;
@@ -36,10 +37,10 @@ body {
     color: #3c4043;
     margin: 20px auto;
 }
+
 .g-btn:hover { background-color: #f7fafe; border-color: #d2e3fc; }
 .g-btn img { width: 18px; margin-right: 10px; }
 
-/* --- 3D ELEMENT (THE CARD) --- */
 .element {
     width: 120px;
     height: 160px;
@@ -58,13 +59,13 @@ body {
 .element:hover {
     box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
     border: 1px solid rgba(127,255,255,0.75);
-    z-index: 100; /* Bring to front on hover */
+    z-index: 100;
 }
 
 .element img {
     width: 80px;
     height: 80px;
-    border-radius: 50%; /* Circular photo */
+    border-radius: 50%;
     object-fit: cover;
     margin-bottom: 10px;
     border: 2px solid rgba(255,255,255,0.5);
@@ -83,7 +84,6 @@ body {
     color: rgba(127,255,255,0.75);
 }
 
-/* --- MENU --- */
 #menu {
     position: absolute;
     bottom: 20px;
@@ -91,6 +91,7 @@ body {
     text-align: center;
     z-index: 100;
 }
+
 button {
     color: rgba(127,255,255,0.75);
     background: transparent;
@@ -100,5 +101,6 @@ button {
     cursor: pointer;
     margin: 0 5px;
 }
+
 button:hover { background-color: rgba(0,255,255,0.5); }
 button:active { color: #000000; background-color: rgba(0,255,255,0.75); }
